@@ -1,0 +1,72 @@
+
+#BANNER
+smtpd_banner = $myhostname ESMTP - SISTEMAS
+
+# Desabilitar comando VRFY
+disable_vrfy_command = yes
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+delay_warning_time = 1h
+
+readme_directory = no
+
+# TLS parameters
+# CERTIFICADOS DO CLIENTE
+smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_use_tls=yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+# See /usr/share/doc/postfix/TLS_README.gz in the postfix-doc package for
+# information on enabling SSL in the smtp client.
+
+myhostname = <%= @mydestination  %>
+myorigin = <%= @myorigin  %>
+mydestination = <%= @mydestination  %>, localhost
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+
+# Caso o ambiente necessite de entregas para destinos diferentes
+transport_maps = hash:/etc/postfix/transport
+
+# MTA para encaminhar as mensagens 
+relayhost = <%= @relayhost  %>
+
+
+# HOSTS autorizados a utilizarem o Postfix para envio de mensagens
+mynetworks = 127.0.0.0/8
+
+## Habilita autenticacao SMTP
+smtpd_sasl_auth_enable = yes
+broken_sasl_auth_clients = yes
+smtpd_sasl_security_options = noanonymous
+
+
+## Modificar possiveis comandos invalidos da aplicacao
+smtpd_command_filter = hash:/etc/postfix/command_filter
+
+## Forca colocar message-id caso a mensagem nao possua
+always_add_missing_headers = yes
+
+##
+smtp_discard_ehlo_keywords = 8bitmime
+
+## Permite apenas as aplicacoes enviar nesse servidor
+smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject
+
+queue_run_delay = 480s
+
+bounce_queue_lifetime = 5400s
+
+maximal_queue_lifetime = 5400s
+
+## Tamanho maximo das mensagens
+#message_size_limit = 5242880 
+
+smtpd_sasl_path = smtpd
+
